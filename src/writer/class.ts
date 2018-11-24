@@ -71,26 +71,30 @@ export class ClassType extends BaseType {
     }, {});
   }
 
-  writeClass(name, classObj, opts: WriteOpts = {}) {
-    const { enable, entityName, extendsClass } = opts;
+  writeClass = (name, classObj, opts: WriteOpts = {}) => {
+    console.log("writeClass", { name, classObj, opts });
+    this.validateObj(classObj);
+    const { enable = {}, entityName, extendsClass } = opts;
     const { directives, decorators, directiveKeys } = classObj;
     let header = `${className(entityName)} ${name}`;
     header = extendsClass
       ? [header, "extends", className(extendsClass)].join(" ")
       : header;
     const directivesMap = directives || decorators;
+
     header =
       enable.directives || enable.decorators
         ? addDirectives(header, directivesMap, directiveKeys)
         : header;
     header = enable.implements
-      ? addImplements(header, classObj.implements, "implements")
+      ? this.addImplements(header, classObj.implements, "implements")
       : header;
     const fields = classObj.fields || {};
-    return `${header} {\n${writeFields(fields)}\n}\n`;
-  }
+    return `${header} {\n${this.writeFields(fields)}\n}\n`;
+  };
 
-  addImplements(txt, $implements) {
+  addImplements(txt, $implements, keyWord?: string) {
+    txt = keyWord ? [txt, keyWord].join(" ") : txt;
     return [txt, this.writeImplements($implements)].join(" ");
   }
 
@@ -98,10 +102,12 @@ export class ClassType extends BaseType {
     return $implements.join(", ");
   }
 
-  writeFields(fields) {
+  writeFields(fields = {}) {
     const fieldKeys = Object.keys(fields);
+    console.log("write fields", { fields, fieldKeys });
     const fieldMap = fieldKeys.reduce((acc, name) => {
-      const fieldObj = fieldMap[name];
+      const fieldObj = fields[name] || {};
+      console.log("write field", name);
       acc[name] = this.writeField(name, fieldObj);
       return acc;
     }, {});
@@ -110,7 +116,7 @@ export class ClassType extends BaseType {
 
   writeField(fieldName, fieldObj) {
     const {
-      type,
+      type = "String",
       isNullable,
       isList,
       directives,

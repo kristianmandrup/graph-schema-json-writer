@@ -10,4 +10,15 @@ export class BaseType {
     const values = (<any>Object).values(map);
     return newLine ? values.join("\n") : values;
   }
+
+  validateObj(obj) {
+    if (typeof obj === "object") return;
+    this.validateError("object", obj);
+  }
+
+  validateError(type, obj) {
+    const msg = `Validation error: ${type}`;
+    console.error(msg, obj);
+    throw new Error(msg);
+  }
 }

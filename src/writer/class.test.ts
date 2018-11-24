@@ -1,6 +1,6 @@
 import { ClassType, writeClass } from "./class";
 
-const map = {
+const personMap = {
   fields: {
     name: {
       type: "String",
@@ -34,11 +34,21 @@ const map = {
   extends: "BaseEntity"
 };
 
-describe("ClassType", () => {
+describe.only("ClassType", () => {
   const classType = new ClassType();
 
   describe("write", () => {
-    const written = classType.write(map);
+    const written = classType.write({ Person: personMap });
+    console.log(written);
+
+    test("written", () => {
+      expect(written).toBeDefined();
+    });
+  });
+
+  describe.only("writeClass", () => {
+    const written = classType.writeClass("Person", personMap);
+    console.log(written);
 
     test("written", () => {
       expect(written).toBeDefined();
@@ -46,8 +56,8 @@ describe("ClassType", () => {
   });
 });
 
-describe("writeClass", () => {
-  const written = writeClass("Person", map);
+describe.skip("writeClass", () => {
+  const written = writeClass("Person", personMap);
 
   test("written", () => {
     expect(written).toBeDefined();
