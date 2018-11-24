@@ -1,36 +1,28 @@
-import { writeTypes, Type } from "./type";
-import { writeEnums, Enum } from "./enum";
+import { writeAllTypes, Type } from "./type";
+import { writeAllEnums, Enum } from "./enum";
 import { schemaByType } from "../accessor";
-import { writeInterfaces, Interface } from "./interface";
-import { writeInputs, Input } from "./input";
-import { writeClasses, writeClass, ClassType } from "./class";
-import { writeUnions, Union } from "./union";
+import { writeAllInterfaces, Interface } from "./interface";
+import { writeAllInputs, Input } from "./input";
+import { writeAllClasses, ClassType } from "./class";
+import { writeAllUnions, Union } from "./union";
 import { flattenMap } from "./util";
 import { SchemaTypeMap } from "../types";
 
-export {
-  Type,
-  Enum,
-  Interface,
-  Input,
-  Union,
-  ClassType,
-  writeClasses,
-  writeClass
-};
+export { Type, Enum, Interface, Input, Union, ClassType, writeAllClasses };
 
-export const writeToTypeDef = (jsonSchema, flatten = false) => {
+export const writeToTypeDef = (jsonSchema, opts: any = {}) => {
+  const { flatten } = opts;
   const schemaTypeMap: SchemaTypeMap = schemaByType(jsonSchema);
   const { types, enums, inputs, interfaces, unions } = schemaTypeMap;
 
   const writeMap = {
-    types: writeTypes(types),
-    enums: writeEnums(enums),
-    interfaces: writeInterfaces(interfaces),
-    inputs: writeInputs(inputs),
-    unions: writeUnions(unions)
+    types: writeAllTypes(types, opts),
+    enums: writeAllEnums(enums, opts),
+    interfaces: writeAllInterfaces(interfaces, opts),
+    inputs: writeAllInputs(inputs, opts),
+    unions: writeAllUnions(unions, opts)
   };
 
   // for each value
-  return flatten ? flattenMap(writeMap, true) : writeMap;
+  return flatten ? flattenMap(writeMap, flatten) : writeMap;
 };

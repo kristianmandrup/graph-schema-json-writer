@@ -19,13 +19,17 @@ const writeEnum = (name, enumObj) => {
 
 const writeFields = fields => {};
 
+export const writeAllEnums = (map, opts = {}) => {
+  return createEnum(map, opts).write(map);
+};
+
 export const createEnum = (map, opts = {}) => {
-  return new Enum(map);
+  return new Enum(map, opts);
 };
 
 export class Enum extends BaseType {
-  constructor(map?) {
-    super(map);
+  constructor(map?, opts?) {
+    super(map, opts);
   }
 
   write(enumMap?) {

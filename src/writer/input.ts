@@ -9,8 +9,12 @@ export const writeInput = (name, typeObj, opts = {}) =>
     ...opts
   });
 
+export const writeAllInputs = (map, opts = {}) => {
+  return createInput(map, opts).write(map);
+};
+
 export const createInput = (map, opts = {}) => {
-  return new Input(map);
+  return new Input(map, opts);
 };
 
 export class Input extends Type {

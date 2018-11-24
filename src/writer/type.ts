@@ -59,8 +59,12 @@ const writeField = (fieldName, fieldObj) => {
   return addDirectives(header, decoratorMap, directiveKeys);
 };
 
+export const writeAllTypes = (map, opts = {}) => {
+  return createType(map, opts).write(map);
+};
+
 export const createType = (map, opts = {}) => {
-  return new Type(map);
+  return new Type(map, opts);
 };
 
 export class Type extends BaseType {

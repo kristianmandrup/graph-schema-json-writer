@@ -19,13 +19,17 @@ const writeUnion = (name, unionObj) => {
 
 const writeFields = fields => {};
 
+export const writeAllUnions = (map, opts = {}) => {
+  return createUnion(map, opts).write(map);
+};
+
 export const createUnion = (map, opts = {}) => {
-  return new Union(map);
+  return new Union(map, opts);
 };
 
 export class Union extends BaseType {
-  constructor(map?) {
-    super(map);
+  constructor(map?, opts = {}) {
+    super(map, opts);
   }
 
   write(unionMap?) {

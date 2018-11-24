@@ -57,6 +57,10 @@ const writeField = (fieldName, fieldObj) => {
   return addDirectives(header, directives);
 };
 
+export const writeAllClasses = (map, opts = {}) => {
+  return createClass(map, opts).write(map);
+};
+
 export const createClass = (map, opts = {}) => {
   return new ClassType(map);
 };

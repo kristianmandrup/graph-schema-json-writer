@@ -13,6 +13,10 @@ export const writeInterface = (name, typeObj, opts = {}) =>
     ...opts
   });
 
+export const writeAllInterfaces = (map, opts = {}) => {
+  return createInterface(map, opts).write(map);
+};
+
 export const createInterface = (map, opts = {}) => {
   return new Interface(map, opts);
 };
