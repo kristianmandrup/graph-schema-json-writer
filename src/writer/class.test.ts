@@ -54,6 +54,25 @@ describe.only("ClassType", () => {
       expect(written).toBeDefined();
     });
   });
+
+  describe.only("writeClass with extendsClass", () => {
+    const written = classType.writeClass("Person", personMap, {
+      extendsClass: "BaseEntity"
+    });
+    console.log(written);
+
+    test("extends BaseEntity", () => {
+      expect(written).toMatch(/Person extends BaseEntity/);
+    });
+  });
+
+  describe("addImplements", () => {
+    const header = classType.addImplements("class Person", ["IEntity"]);
+
+    test("implements IEntity", () => {
+      expect(header).toMatch(/Person implements IEntity/);
+    });
+  });
 });
 
 describe.skip("writeClass", () => {

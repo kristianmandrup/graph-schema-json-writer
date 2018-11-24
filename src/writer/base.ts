@@ -2,13 +2,17 @@ import { Directive } from "./directive";
 
 export class BaseType {
   map: any;
-  constructor(map = {}) {
+  opts: any;
+
+  constructor(map = {}, opts: any = {}) {
     this.map = map;
+    this.opts = opts;
   }
 
-  flattenMap(map, newLine = false) {
-    const values = (<any>Object).values(map);
-    return newLine ? values.join("\n") : values;
+  flattenMap(map, separator: any = false) {
+    const values = Array.isArray(map) ? map : (<any>Object).values(map);
+    separator = separator === true ? "\n" : separator;
+    return separator ? values.join(separator) : values.join(" ");
   }
 
   validateObj(obj) {
@@ -20,5 +24,9 @@ export class BaseType {
     const msg = `Validation error: ${type}`;
     console.error(msg, obj);
     throw new Error(msg);
+  }
+
+  indent(txt) {
+    return "  " + txt;
   }
 }

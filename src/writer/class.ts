@@ -1,6 +1,6 @@
 import { classify } from "underscore.string";
 import { BaseType } from "./base";
-import { addDirectives, Directive } from "./directive";
+import { addDirectives, createDirective } from "./directive";
 import { addImplements } from "./implements";
 import { flattenMap } from "./util";
 import { WriteOpts } from "../types";
@@ -62,6 +62,13 @@ export const createClass = (map, opts = {}) => {
 };
 
 export class ClassType extends BaseType {
+  addRequired: boolean;
+
+  constructor(map?, opts: any = {}) {
+    super(map, opts);
+    this.addRequired = opts.addRequired;
+  }
+
   write(classMap, write = this.writeClass) {
     const classKeys = Object.keys(classMap);
     return classKeys.reduce((acc, name) => {
@@ -72,11 +79,10 @@ export class ClassType extends BaseType {
   }
 
   writeClass = (name, classObj, opts: WriteOpts = {}) => {
-    console.log("writeClass", { name, classObj, opts });
     this.validateObj(classObj);
-    const { enable = {}, entityName, extendsClass } = opts;
+    const { enable = {}, entityName = "class", extendsClass } = opts;
     const { directives, decorators, directiveKeys } = classObj;
-    let header = `${className(entityName)} ${name}`;
+    let header = `${entityName} ${className(name)}`;
     header = extendsClass
       ? [header, "extends", className(extendsClass)].join(" ")
       : header;
@@ -104,14 +110,12 @@ export class ClassType extends BaseType {
 
   writeFields(fields = {}) {
     const fieldKeys = Object.keys(fields);
-    console.log("write fields", { fields, fieldKeys });
     const fieldMap = fieldKeys.reduce((acc, name) => {
       const fieldObj = fields[name] || {};
-      console.log("write field", name);
       acc[name] = this.writeField(name, fieldObj);
       return acc;
     }, {});
-    return flattenMap(fieldMap, true);
+    return this.flattenMap(fieldMap, "\n\n");
   }
 
   writeField(fieldName, fieldObj) {
@@ -125,22 +129,43 @@ export class ClassType extends BaseType {
       keys
     } = fieldObj;
     let header = `${fieldName}: ${type}`;
+
+    const decoratorKeys = memberKeys || keys;
     const decoratorMap = decorators || directives;
-    const decoratorKeys = memberKeys || keys || Object.keys(decoratorMap);
-    header = isNullable ? header : `${header}!`;
+
+    if (!isNullable && this.addRequired) {
+      decoratorMap.Required = {};
+      if (decoratorKeys) {
+        decoratorKeys.push("Nullable");
+      }
+    }
+    const resolvedKeys = decoratorKeys || Object.keys(decoratorMap);
     header = isList ? `[${header}]` : header;
-    return this.addDecorators(header, decoratorMap, decoratorKeys);
+    header = this.indent(header);
+    const withDecorators =
+      resolvedKeys.length > 0
+        ? this.addDecorators(header, decoratorMap, resolvedKeys)
+        : header;
+    return withDecorators;
   }
 
   addDecorators(header, decorators, decoratorKeys) {
     const dirWriter = this.createDecoratorWriter(decorators, {
       keys: decoratorKeys
     });
-    const dirText = dirWriter.write();
-    return decoratorKeys.length > 0 ? [dirText, header].join("\n") : header;
+    const dirResult = dirWriter.write();
+    const dirText =
+      typeof dirResult === "string"
+        ? dirResult
+        : this.flattenMap(dirResult, "\n  ");
+    const decoratorsTxt =
+      decoratorKeys.length > 0 || dirText.length > 0
+        ? [dirText, header].join("\n")
+        : header;
+    return this.indent(decoratorsTxt);
   }
 
   createDecoratorWriter(directives, opts) {
-    return new Directive(directives, opts);
+    return createDirective(directives, { ...opts, argsWrapped: true });
   }
 }
