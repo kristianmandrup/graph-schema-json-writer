@@ -45,9 +45,9 @@ export class Directive extends BaseType {
   config: any;
   argsWrapped: boolean = false;
 
-  constructor(map?, opts?: any) {
+  constructor(map = {}, opts: any = {}) {
     super();
-    const { keys, config, argsWrapped } = opts;
+    const { keys = [], config, argsWrapped } = opts;
     this.directives = map;
     this.keys = keys || Object.keys(map);
     this.config = config;

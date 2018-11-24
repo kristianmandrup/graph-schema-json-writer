@@ -34,8 +34,9 @@ const map = {
 describe("Directive", () => {
   const directive = new Directive();
 
-  describe("write: Entity", () => {
+  describe("write: Entity directive", () => {
     const written = directive.write(map.directives.Entity);
+    console.log(written);
 
     test("written", () => {
       expect(written).toBeDefined();

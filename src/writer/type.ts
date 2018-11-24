@@ -72,7 +72,7 @@ export class Type extends BaseType {
     }, {});
   };
 
-  writeType = (name, typeObj, opts: WriteOpts = {}) => {
+  writeType = (name, typeObj: any = {}, opts: WriteOpts = {}) => {
     const { entityName = "type", enable } = opts;
     const { directives } = typeObj;
     let header = `${entityName} ${name}`;
