@@ -31,11 +31,12 @@ export class Union extends BaseType {
   write(unionMap?) {
     unionMap = unionMap || this.map;
     const unionKeys = Object.keys(unionMap);
-    return unionKeys.reduce((acc, name) => {
+    const unionTxtMap = unionKeys.reduce((acc, name) => {
       const unionObj = unionMap[name];
       acc[name] = this.writeUnion(name, unionObj);
       return acc;
     }, {});
+    return this.flattenMap(unionTxtMap, "\n");
   }
 
   writeUnion(name, unionObj: any = {}) {

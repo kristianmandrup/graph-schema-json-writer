@@ -2,6 +2,7 @@ import { flattenMap } from "./util";
 import { BaseType } from "./base";
 
 export const addDirectives = (txt, directives, directiveKeys?) => {
+  if (!directives) return txt;
   const dirTxt = flattenMap(writeDirectives(directives, directiveKeys));
   console.log({ dirTxt });
   return [txt, dirTxt].join(" ");
@@ -45,19 +46,23 @@ export class Directive extends BaseType {
   config: any;
   argsWrapped: boolean = false;
 
-  constructor(map = {}, opts: any = {}) {
+  constructor(map?, opts: any = {}) {
     super();
-    const { keys = [], config, argsWrapped } = opts;
+    const { keys, config, argsWrapped } = opts;
     this.directives = map;
-    this.keys = keys || Object.keys(map);
+    this.keys = keys || (map && Object.keys(map));
     this.config = config;
     this.argsWrapped = argsWrapped;
   }
 
   write(directives?) {
+    if (!directives) return "";
     this.directives = directives || this.directives;
-    const dirMap = this.keys.reduce(this.directiveReducer(), {});
-    return dirMap;
+    const keys = this.keys || Object.keys(directives);
+    if (!keys || keys.length === 0) return "";
+    const dirMap = keys.reduce(this.directiveReducer(), {});
+    const dirTxt = this.flattenMap(dirMap);
+    return dirTxt;
   }
 
   directiveReducer() {
@@ -68,16 +73,24 @@ export class Directive extends BaseType {
     };
   }
 
-  writeDirective(name, args, argsWrapped = false) {
-    argsWrapped = argsWrapped || this.argsWrapped;
-    let argsTxt = this.writeDirectiveArgs(args) as string;
-    argsTxt = argsWrapped && argsTxt.length > 0 ? `{${argsTxt}}` : argsTxt;
+  writeDirective(name, args, opts: any = {}) {
+    const { argsWrapped = false, emptyArgs = true } = opts;
+    const dirTxt = `@${name}`;
+    if (!args || args.length === 0) {
+      return emptyArgs ? dirTxt + "()" : dirTxt;
+    }
+    const argsWrap = argsWrapped || this.argsWrapped;
+    let argsTxt = this.writeDirectiveArgs(args);
+    argsTxt =
+      argsWrap && (argsTxt && argsTxt.length > 0) ? `{${argsTxt}}` : argsTxt;
     return `@${name}(${argsTxt})`;
   }
 
   writeDirectiveArgs = (args): string => {
-    const dirMap = Object.keys(args).reduce(this.argReducer(args), {});
-    return this.flattenMap(dirMap);
+    if (!args) return "";
+    const keys = Object.keys(args);
+    const dirMap = keys.reduce(this.argReducer(args), {});
+    return this.flattenMap(dirMap, ", ");
   };
 
   argReducer(args) {
@@ -89,6 +102,10 @@ export class Directive extends BaseType {
   }
 
   writeArg(name, argValue) {
-    return `${name}: ${argValue}`;
+    return `${name}: ${this.writeValue(argValue)}`;
+  }
+
+  writeValue(argValue) {
+    return JSON.stringify(argValue);
   }
 }

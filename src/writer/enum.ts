@@ -31,11 +31,12 @@ export class Enum extends BaseType {
   write(enumMap?) {
     enumMap = enumMap || this.map;
     const enumKeys = Object.keys(enumMap);
-    return enumKeys.reduce((acc, name) => {
+    const enums = enumKeys.reduce((acc, name) => {
       const enumObj = enumMap[name];
       acc[name] = this.writeEnum(name, enumObj);
       return acc;
     }, {});
+    return this.flattenMap(enums, true);
   }
 
   writeEnum(name, enumObj) {
@@ -45,11 +46,6 @@ export class Enum extends BaseType {
   }
 
   writeFields(fields) {
-    const fieldKeys = Object.keys(fields);
-    const fieldMap = fieldKeys.reduce((acc, name) => {
-      acc[name] = name;
-      return acc;
-    }, {});
-    return this.flattenMap(fieldMap, true);
+    return this.indent(fields.join("\n  "));
   }
 }

@@ -14,15 +14,17 @@ export const writeInterface = (name, typeObj, opts = {}) =>
   });
 
 export const createInterface = (map, opts = {}) => {
-  return new Interface(map);
+  return new Interface(map, opts);
 };
 
 export class Interface extends Type {
-  write = typeMap => writeTypes(typeMap, this.writeInput);
+  write(typeMap) {
+    return super.write(typeMap, this.writeInterface);
+  }
 
-  writeInput = (name, typeObj, opts = {}) =>
+  writeInterface = (name, typeObj, opts = {}) =>
     this.writeType(name, typeObj, {
-      entityName: "input",
+      entityName: "interface",
       ...opts
     });
 }

@@ -14,7 +14,14 @@ export const createInput = (map, opts = {}) => {
 };
 
 export class Input extends Type {
-  write = typeMap => writeTypes(typeMap, this.writeInput);
+  constructor(map?, opts = {}) {
+    super(map, opts);
+    this.asDecorator = false;
+  }
+
+  write(typeMap) {
+    return super.write(typeMap, this.writeInput);
+  }
 
   writeInput = (name, typeObj, opts = {}) =>
     this.writeType(name, typeObj, {

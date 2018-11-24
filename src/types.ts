@@ -14,4 +14,5 @@ export type SchemaTypeMap = {
   enums: any;
   inputs: any;
   interfaces: any;
+  unions: any;
 };
