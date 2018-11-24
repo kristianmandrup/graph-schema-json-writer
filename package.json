@@ -1,0 +1,23 @@
+{
+  "name": "graph-schema-json-writer",
+  "version": "1.0.0",
+  "description": "Write JSON/Objct GraphQL schema to String",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "graphql",
+    "json",
+    "schema",
+    "writer"
+  ],
+  "author": "Kristian Mandrup",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^23.3.9",
+    "ts-jest": "^23.10.5",
+    "typescript": "^3.1.6",
+    "underscore.string": "^3.3.5"
+  }
+}
