@@ -110,7 +110,15 @@ enum Gender {
 }
 ```
 
-Note: The writer now also supports writing a TypeScript `class`, complete with `extends` class, implements `interfaces`, decorators for class itself and fields and properties.
+## Writing typescript source files
+
+The writer also supports writing a TypeScript `class`, complete with:
+
+- `extends` class
+- implements `interfaces`
+- decorators for class itself and fields and properties
+- imports for the decorators
+- TODO: imports for superclass extended and interfaces implemented
 
 ```js
 import { schemaToJS } from "../src/schema";
