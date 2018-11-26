@@ -121,20 +121,20 @@ const jsSchema = schemaToJS(schema);
 
 // schema where all entries with keys starting with __ are filtered out
 const classType = createClassType(jsSchema);
-const body = classType.writeClass("Person", jsSchema.Person);
-const imports = classType.writeImportsFor("Person", {
+
+const importsMap = {
   Range: "class-validator"
+};
+const body = classType.writeClass("Person", jsSchema.Person, {
+  importsMap
 });
-
-const sourceFileTxt = [imports, body].join("\n");
-
 console.log(sourceFileTxt);
 ```
 
 Output a TypeScript class with decorators
 
 ```ts
-imports { range } from 'class-validator';
+imports { Range } from 'class-validator';
 
 class Person {
   name: string

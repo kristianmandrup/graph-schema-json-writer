@@ -1,4 +1,4 @@
-import { ClassType, writeClass } from "./class";
+import { ClassType } from "./class";
 
 const personMap = {
   fields: {
@@ -51,11 +51,24 @@ describe.only("ClassType", () => {
     console.log(written);
 
     test("written", () => {
-      expect(written).toBeDefined();
+      expect(written).toMatch(/class Person/);
     });
   });
 
-  describe.only("writeClass with extendsClass", () => {
+  describe("writeClass with importsMap", () => {
+    const importsMap = {
+      Entity: "typeorm"
+    };
+    const written = classType.writeClass("Person", personMap, { importsMap });
+    console.log(written);
+
+    test("written", () => {
+      expect(written).toMatch(/import { Entity } from 'typeorm'/);
+      expect(written).toMatch(/class Person/);
+    });
+  });
+
+  describe("writeClass with extendsClass", () => {
     const written = classType.writeClass("Person", personMap, {
       extendsClass: "BaseEntity"
     });
@@ -72,13 +85,5 @@ describe.only("ClassType", () => {
     test("implements IEntity", () => {
       expect(header).toMatch(/Person implements IEntity/);
     });
-  });
-});
-
-describe.skip("writeClass", () => {
-  const written = writeClass("Person", personMap);
-
-  test("written", () => {
-    expect(written).toBeDefined();
   });
 });

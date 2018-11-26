@@ -28,10 +28,12 @@ export class Imports extends Base {
   }
 
   write() {
-    return Object.keys(this.importsMap).map(moduleName => {
-      const imports = this.importsMap[moduleName];
-      return this.writeImportsEntry(moduleName, imports);
-    });
+    return Object.keys(this.importsMap)
+      .map(moduleName => {
+        const imports = this.importsMap[moduleName];
+        return this.writeImportsEntry(moduleName, imports);
+      })
+      .join("\n");
   }
 
   writeImportsEntry(moduleName, imports) {

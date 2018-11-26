@@ -30,9 +30,11 @@ export const createEnum = (map, opts = {}) => {
 export class Enum extends BaseType {
   protected _fieldSeparator: any;
 
-  constructor(map?, opts?) {
+  constructor(map?, opts: any = {}) {
     super(map, opts);
-    this._fieldSeparator = opts.fieldSeparator;
+    this._fieldSeparator = opts.typescript
+      ? opts.typeScriptFieldSeparator
+      : opts.fieldSeparator;
   }
 
   write(enumMap?) {

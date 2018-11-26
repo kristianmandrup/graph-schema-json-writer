@@ -7,6 +7,7 @@ export type WriteOpts = {
   enable?: any;
   entityName?: string;
   extendsClass?: string;
+  importsMap?: any;
 };
 
 export type SchemaTypeMap = {

@@ -27,12 +27,14 @@ export const writeClass = (name, classObj, opts: WriteOpts = {}) => {
   header = extendsClass
     ? [header, "extends", className(extendsClass)].join(" ")
     : header;
-  header = enable.directives
-    ? addDirectives(header, directives, directiveKeys)
-    : header;
-  header = enable.implements
-    ? addImplements(header, classObj.implements, "implements")
-    : header;
+  header =
+    enable.directives && directives
+      ? addDirectives(header, directives, directiveKeys)
+      : header;
+  header =
+    enable.implements && classObj.implements
+      ? addImplements(header, classObj.implements, "implements")
+      : header;
   const fields = classObj.fields || {};
   return `${header} {\n${writeFields(fields)}\n}\n`;
 };
@@ -81,7 +83,7 @@ export class ClassType extends BaseType {
   }
 
   classDecoratorsFor(classMapOrId: any) {
-    const classMap = this.classMapFor(classMapOrId);
+    const classMap = this.classMapFor(classMapOrId) || {};
     return classMap.decorators || classMap.directives;
   }
 
@@ -135,14 +137,22 @@ export class ClassType extends BaseType {
       ? this.addImplements(header, classObj.implements, "implements")
       : header;
     const fields = classObj.fields || {};
-    return `${header} {\n${this.writeFields(fields)}\n}\n`;
+
+    const classBody = `${header} {\n${this.writeFields(fields)}\n}\n`;
+
+    if (opts.importsMap) {
+      const importsHeader = this.importsFor(name, opts);
+      return [importsHeader, classBody].join("\n\n");
+    }
+
+    return classBody;
   };
 
-  addImplements(txt, $implements, keyWord?: string) {
-    txt = keyWord ? [txt, keyWord].join(" ") : txt;
-    return [txt, this.writeImplements($implements)].join(" ");
+  addImplements(txt, $implements = [], extendKeyword = "implements") {
+    if (!$implements || $implements.length === 0) return "";
+    const header = extendKeyword ? [txt, extendKeyword].join(" ") : txt;
+    return [header, this.writeImplements($implements)].join(" ");
   }
-
   writeImplements($implements) {
     return $implements.join(", ");
   }
