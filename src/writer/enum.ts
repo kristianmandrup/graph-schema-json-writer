@@ -28,8 +28,11 @@ export const createEnum = (map, opts = {}) => {
 };
 
 export class Enum extends BaseType {
+  protected _fieldSeparator: any;
+
   constructor(map?, opts?) {
     super(map, opts);
+    this._fieldSeparator = opts.fieldSeparator;
   }
 
   write(enumMap?) {
@@ -50,6 +53,18 @@ export class Enum extends BaseType {
   }
 
   writeFields(fields) {
-    return this.indent(fields.join("\n  "));
+    return this.indent(fields.join(this.fieldSeparator));
+  }
+
+  get defaultFieldSeparator() {
+    return "\n  ";
+  }
+
+  get typeScriptFieldSeparator() {
+    return "," + this.defaultFieldSeparator;
+  }
+
+  get fieldSeparator() {
+    return this._fieldSeparator || this.defaultFieldSeparator;
   }
 }
