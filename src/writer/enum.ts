@@ -1,5 +1,5 @@
 import { addDirectives } from "./directive";
-import { BaseType } from "./base";
+import { BaseType } from "./base-type";
 
 export const writeEnums = enumMap => {
   const enumKeys = Object.keys(enumMap);

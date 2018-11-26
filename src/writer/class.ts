@@ -99,9 +99,13 @@ export class ClassType extends BaseType {
     ];
   }
 
-  importsFor(classMapOrId: any) {
+  importsFor(classMapOrId: any, opts = {}) {
     const decorators = this.decoratorsFor(classMapOrId);
-    return new Imports(decorators, this.opts);
+    return new Imports(decorators, opts || this.opts);
+  }
+
+  writeImportsFor(classMapOrId: any, opts = {}) {
+    return this.importsFor(classMapOrId, opts).write();
   }
 
   write(classMap, write = this.writeClass) {

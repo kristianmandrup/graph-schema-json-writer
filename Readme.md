@@ -112,6 +112,40 @@ enum Gender {
 
 Note: The writer now also supports writing a TypeScript `class`, complete with `extends` class, implements `interfaces`, decorators for class itself and fields and properties.
 
+```js
+import { schemaToJS } from "../src/schema";
+import { writer } from "graph-schema-json-writer";
+const { writeToTypeDef } = writer;
+/// ... generate JSON schema
+const jsSchema = schemaToJS(schema);
+
+// schema where all entries with keys starting with __ are filtered out
+const classType = createClassType(jsSchema);
+const body = classType.writeClass("Person", jsSchema.Person);
+const imports = classType.writeImportsFor("Person", {
+  Range: "class-validator"
+});
+
+const sourceFileTxt = [imports, body].join("\n");
+
+console.log(sourceFileTxt);
+```
+
+Output a TypeScript class with decorators
+
+```ts
+imports { range } from 'class-validator';
+
+class Person {
+  name: string
+
+  @Range(min: 0, max: 130)
+  age: number
+}
+```
+
+## Use cases
+
 This class writer could be used for writing classed for [TypeORM](http://typeorm.io/#/), [NestJS](https://nestjs.com/) or [TypeGraphQL](https://19majkel94.github.io/type-graphql/) etc.
 
 Note that the class writer supports passing `decorators` in place of `directives`.
