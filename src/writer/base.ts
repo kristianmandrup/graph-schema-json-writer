@@ -1,18 +1,10 @@
-import { Directive } from "./directive";
-
-export class BaseType {
-  map: any;
+export class Base {
+  value: any;
   opts: any;
 
-  constructor(map = {}, opts: any = {}) {
-    this.map = map;
+  constructor(value, opts: any = {}) {
+    this.value = value;
     this.opts = opts;
-  }
-
-  flattenMap(map, separator: any = false) {
-    const values = Array.isArray(map) ? map : (<any>Object).values(map);
-    separator = separator === true ? "\n" : separator;
-    return separator ? values.join(separator) : values.join(" ");
   }
 
   validateObj(obj) {
@@ -22,6 +14,10 @@ export class BaseType {
 
   validateError(type, obj) {
     const msg = `Validation error: ${type}`;
+    this.error(msg, obj);
+  }
+
+  error(msg, obj) {
     console.error(msg, obj);
     throw new Error(msg);
   }

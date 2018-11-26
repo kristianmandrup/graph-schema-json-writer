@@ -1,9 +1,10 @@
 import { classify } from "underscore.string";
-import { BaseType } from "./base";
+import { BaseType } from "./base-type";
 import { addDirectives, createDirective } from "./directive";
 import { addImplements } from "./implements";
 import { flattenMap } from "./util";
 import { WriteOpts } from "../types";
+import { Imports } from "./imports";
 
 export const writeClasses = (classMap, write = writeClass) => {
   const classKeys = Object.keys(classMap);
@@ -71,6 +72,36 @@ export class ClassType extends BaseType {
   constructor(map?, opts: any = {}) {
     super(map, opts);
     this.addRequired = opts.addRequired;
+  }
+
+  classMapFor(classMapOrId: any) {
+    return typeof classMapOrId === "string"
+      ? this.map[classMapOrId]
+      : classMapOrId;
+  }
+
+  classDecoratorsFor(classMapOrId: any) {
+    const classMap = this.classMapFor(classMapOrId);
+    return classMap.decorators || classMap.directives;
+  }
+
+  fieldDecoratorsFor(classMapOrId: any) {
+    const classMap = this.classMapFor(classMapOrId);
+    return Object.values(classMap.fields)
+      .map((field: any) => field.decorators || field.directives)
+      .flatMap(item => item);
+  }
+
+  decoratorsFor(classMapOrId: any) {
+    return [
+      ...this.classDecoratorsFor(classMapOrId),
+      ...this.fieldDecoratorsFor(classMapOrId)
+    ];
+  }
+
+  importsFor(classMapOrId: any) {
+    const decorators = this.decoratorsFor(classMapOrId);
+    return new Imports(decorators, this.opts);
   }
 
   write(classMap, write = this.writeClass) {

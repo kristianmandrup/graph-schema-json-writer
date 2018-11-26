@@ -5,10 +5,20 @@ import { writeAllInterfaces, Interface } from "./interface";
 import { writeAllInputs, Input } from "./input";
 import { writeAllClasses, ClassType } from "./class";
 import { writeAllUnions, Union } from "./union";
+import { Imports } from "./imports";
 import { flattenMap } from "./util";
 import { SchemaTypeMap } from "../types";
 
-export { Type, Enum, Interface, Input, Union, ClassType, writeAllClasses };
+export {
+  Imports,
+  Type,
+  Enum,
+  Interface,
+  Input,
+  Union,
+  ClassType,
+  writeAllClasses
+};
 
 export const writeToTypeDef = (jsonSchema, opts: any = {}) => {
   const { flatten } = opts;
