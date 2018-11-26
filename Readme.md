@@ -134,7 +134,7 @@ console.log(sourceFileTxt);
 Output a TypeScript class with decorators
 
 ```ts
-imports { Range } from 'class-validator';
+import { Range } from 'class-validator';
 
 class Person {
   name: string
