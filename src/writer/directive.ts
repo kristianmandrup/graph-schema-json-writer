@@ -1,22 +1,22 @@
 import { flattenMap } from "./util";
 import { BaseType } from "./base-type";
 
-export const addDirectives = (txt, directives, directiveKeys?) => {
+export const addDirectives = (txt, directives, directiveKeys?, opts = {}) => {
   if (!directives) return txt;
   const dirTxt = flattenMap(writeDirectives(directives, directiveKeys));
-  console.log({ dirTxt });
   return [txt, dirTxt].join(" ");
 };
 
-export const writeDirectives = (directives, directiveKeys?) => {
+export const writeDirectives = (directives, directiveKeys?, opts = {}) => {
   directiveKeys = directiveKeys || Object.keys(directives);
-  return directiveKeys.reduce(directiveReducer(directives), {});
+  return directiveKeys.reduce(directiveReducer(directives, opts), {});
 };
 
-const directiveReducer = directives => {
+const directiveReducer = (directives, opts: any = {}) => {
   return (acc, name) => {
     const args = directives[name];
-    acc[name] = writeDirective(name, args);
+    const dirName = opts.directivesMap ? opts.directivesMap[name] : name;
+    acc[dirName] = writeDirective(dirName, args);
     return acc;
   };
 };
@@ -55,20 +55,22 @@ export class Directive extends BaseType {
     this.argsWrapped = argsWrapped;
   }
 
-  write(directives?) {
+  write(directives?, opts: any = {}) {
     if (!directives) return "";
+    opts = opts || this.opts;
     this.directives = directives || this.directives;
     const keys = this.keys || Object.keys(directives);
     if (!keys || keys.length === 0) return "";
-    const dirMap = keys.reduce(this.directiveReducer(), {});
+    const dirMap = keys.reduce(this.directiveReducer(opts), {});
     const dirTxt = this.flattenMap(dirMap);
     return dirTxt;
   }
 
-  directiveReducer() {
+  directiveReducer(opts: any = {}) {
     return (acc, name) => {
       const args = this.directives[name];
-      acc[name] = this.writeDirective(name, args);
+      const dirName = opts.directivesMap ? opts.directivesMap[name] : name;
+      acc[dirName] = this.writeDirective(dirName, args);
       return acc;
     };
   }
