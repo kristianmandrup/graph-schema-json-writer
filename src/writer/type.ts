@@ -1,4 +1,4 @@
-import { BaseType } from "./base";
+import { BaseType } from "./base-type";
 import { addDirectives, createDirective } from "./directive";
 import { addImplements } from "./implements";
 import { WriteOpts } from "../types";

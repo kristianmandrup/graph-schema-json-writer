@@ -1,5 +1,5 @@
 import { flattenMap } from "./util";
-import { BaseType } from "./base";
+import { BaseType } from "./base-type";
 
 export const addDirectives = (txt, directives, directiveKeys?) => {
   if (!directives) return txt;

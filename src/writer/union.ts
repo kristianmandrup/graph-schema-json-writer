@@ -1,5 +1,5 @@
 import { addDirectives } from "./directive";
-import { BaseType } from "./base";
+import { BaseType } from "./base-type";
 
 export const writeUnions = unionMap => {
   const unionKeys = Object.keys(unionMap);
