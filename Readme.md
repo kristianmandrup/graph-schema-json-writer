@@ -117,8 +117,7 @@ The writer also supports writing a TypeScript `class`, complete with:
 - `extends` class
 - implements `interfaces`
 - decorators for class itself and fields and properties
-- imports for the decorators
-- TODO: imports for superclass extended and interfaces implemented
+  - imports for the decorators, interfaces and class extended
 
 ```js
 import { schemaToJS } from "../src/schema";
@@ -131,7 +130,9 @@ const jsSchema = schemaToJS(schema);
 const classType = createClassType(jsSchema);
 
 const importsMap = {
-  Range: "class-validator"
+  Range: "class-validator",
+  BaseEntity: "typeorm",
+  Entity: "typeorm"
 };
 const body = classType.writeClass("Person", jsSchema.Person, {
   importsMap
@@ -142,9 +143,11 @@ console.log(sourceFileTxt);
 Output a TypeScript class with decorators
 
 ```ts
+import { BaseEntity, Entity } from 'typeorm';
 import { Range } from 'class-validator';
 
-class Person {
+@Entity()
+class Person extends BaseEntity {
   name: string
 
   @Range(min: 0, max: 130)

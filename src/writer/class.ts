@@ -87,6 +87,11 @@ export class ClassType extends BaseType {
     return classMap.decorators || classMap.directives;
   }
 
+  interfacesFor(classMapOrId: any) {
+    const classMap = this.classMapFor(classMapOrId) || {};
+    return classMap.implements || classMap.interfaces;
+  }
+
   fieldDecoratorsFor(classMapOrId: any) {
     const classMap = this.classMapFor(classMapOrId);
     return Object.values(classMap.fields)
@@ -101,9 +106,16 @@ export class ClassType extends BaseType {
     ];
   }
 
-  importsFor(classMapOrId: any, opts = {}) {
-    const decorators = this.decoratorsFor(classMapOrId);
-    return new Imports(decorators, opts || this.opts);
+  importsFor(classMapOrId: any, opts: any = {}) {
+    const decorators = this.decoratorsFor(classMapOrId) || [];
+    const { extendsClass } = opts;
+    const interfaces = this.interfacesFor(classMapOrId) || [];
+    const allImportConsts = [extendsClass, ...decorators, ...interfaces];
+    return new Imports(allImportConsts, opts || this.opts);
+  }
+
+  extendsClassImportFor(className, opts = {}) {
+    return new Imports([className], opts || this.opts);
   }
 
   writeImportsFor(classMapOrId: any, opts = {}) {
@@ -141,7 +153,7 @@ export class ClassType extends BaseType {
     const classBody = `${header} {\n${this.writeFields(fields)}\n}\n`;
 
     if (opts.importsMap) {
-      const importsHeader = this.importsFor(name, opts);
+      const importsHeader = this.writeImportsFor(name, opts);
       return [importsHeader, classBody].join("\n\n");
     }
 
