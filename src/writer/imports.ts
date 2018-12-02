@@ -9,17 +9,20 @@ export class Imports extends Base {
     super(decorators, opts);
     this.decorators = decorators;
     this.importsLookupMap = opts.importsMap;
-    this.importsMap = this.resolveImportsMap();
+    this.importsMap = this.resolveImportsMap(opts);
   }
 
-  resolveImportsMap() {
+  resolveImportsMap(opts) {
     return this.decorators.reduce((acc, name) => {
       const moduleName = this.importsLookupMap[name];
       if (!moduleName) {
-        this.validateError(
-          `missing imports entry for ${name}`,
-          this.importsLookupMap
-        );
+        if (opts.validate) {
+          this.validateError(
+            `missing imports entry for ${name}`,
+            this.importsLookupMap
+          );
+        }
+        return acc;
       }
       acc[moduleName] = acc[moduleName] || [];
       acc[moduleName].push(name);

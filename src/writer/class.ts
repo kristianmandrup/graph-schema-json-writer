@@ -135,15 +135,22 @@ export class ClassType extends BaseType {
     const { extendsClass } = opts;
     const interfaces = this.interfacesFor(classMapOrId) || [];
 
-    const enumRefNames: string[] = this.enumRefNames(classMapOrId) || [];
-    const classRefNames: string[] = this.classRefNames(classMapOrId) || [];
+    const refNames = [];
+    if (opts.enumRefs) {
+      const enumRefNames: string[] = this.enumRefNames(classMapOrId) || [];
+      refNames.push(...enumRefNames);
+    }
+
+    if (opts.classRefs) {
+      const classRefNames: string[] = this.classRefNames(classMapOrId) || [];
+      refNames.push(...classRefNames);
+    }
 
     const allImportConsts = [
       extendsClass,
       ...decorators,
       ...interfaces,
-      ...enumRefNames,
-      ...classRefNames
+      ...refNames
     ];
     return new Imports(allImportConsts, opts || this.opts);
   }
