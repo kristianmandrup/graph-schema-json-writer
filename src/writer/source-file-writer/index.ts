@@ -30,6 +30,7 @@ type TypeDefMap = {
 export class SourceFileWriter extends Base {
   writers: any;
   strategy: FileStrategy;
+  typeDefMap: any;
 
   constructor(opts: any = {}) {
     super(opts);
@@ -37,6 +38,7 @@ export class SourceFileWriter extends Base {
   }
 
   async writeTypeDefs(typeDefMap: TypeDefMap, opts: any = {}) {
+    this.typeDefMap = typeDefMap;
     const keys: string[] = Object.keys(typeDefMap);
     const { only } = opts;
     const keysToUse =
@@ -60,6 +62,21 @@ export class SourceFileWriter extends Base {
 
   writerFor(typeDef: any) {
     return this.writers[typeDef.type] || this.createWriterFor(typeDef);
+  }
+
+  enumImportsMap(names: string[]) {
+    return this.strategy.enumImportsMap(names);
+  }
+
+  classImportsMap(names: string[]) {
+    return this.strategy.classImportsMap(names);
+  }
+
+  classRefImportsMap(map: any) {
+    return {
+      ...this.classImportsMap(map.enumRefs),
+      ...this.enumImportsMap(map.classRefs)
+    };
   }
 
   get writerMap() {

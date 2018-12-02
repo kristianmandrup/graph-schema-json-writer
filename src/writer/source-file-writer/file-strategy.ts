@@ -1,4 +1,5 @@
 import * as fs from "fs-extra";
+import * as path from "path";
 import { dasherize } from "underscore.string";
 import { Base } from "../base";
 
@@ -20,6 +21,35 @@ export class FileStrategy extends Base {
 
   enumFilePathFor(name) {
     return this.filePathFor({ name, type: "Enum" });
+  }
+
+  fileMapFor(names: string[], type: string = "enum", withExt = false) {
+    return names.reduce((acc, name) => {
+      const filePathFn = this[`${type}FilePathFor`].bind(this);
+      const filePath = filePathFn(name);
+      acc[name] = withExt ? filePath : this.importRefName(filePath);
+      return acc;
+    }, {});
+  }
+
+  importRefName(filePath) {
+    return path.join(path.dirname(filePath), path.basename(filePath, ".ts"));
+  }
+
+  enumFileMapFor(names: string[], withExt = true) {
+    return this.fileMapFor(names, "enum", withExt);
+  }
+
+  classFileMapFor(names: string[], withExt = true) {
+    return this.fileMapFor(names, "class", withExt);
+  }
+
+  enumImportsMap(names) {
+    return this.enumFileMapFor(names, false);
+  }
+
+  classImportsMap(names) {
+    return this.classFileMapFor(names, false);
   }
 
   classFilePathFor(name) {

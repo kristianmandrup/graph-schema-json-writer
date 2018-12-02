@@ -116,6 +116,13 @@ export class ClassType extends BaseType {
     return Object.keys(this.classRefsFor(idOrObj));
   }
 
+  refNames(idOrObj: string): any {
+    return {
+      classRefs: this.classRefNames(idOrObj),
+      enumRefs: this.enumRefNames(idOrObj)
+    };
+  }
+
   decoratorsFor(classMapOrId: any) {
     return [
       ...this.classDecoratorsFor(classMapOrId),

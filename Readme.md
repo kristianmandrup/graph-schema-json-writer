@@ -228,6 +228,13 @@ For the `ClassType` class, see the following methods for reference:
 
 Please submit PRs to make it even easier to write a set of classes with all referenced classes, enums etc. as files, all linked with correct imports. Almost there!
 
+You can try using the following API to generate an imports map for a given class such as `Person`
+
+```ts
+const names = classType.refNames("Person");
+const classRefImportsMap = classWriter.classRefImportsMap(names);
+```
+
 ## Use cases
 
 This class writer could be used for writing classed for [TypeORM](http://typeorm.io/#/), [NestJS](https://nestjs.com/) or [TypeGraphQL](https://19majkel94.github.io/type-graphql/) etc.
