@@ -1,6 +1,6 @@
 {
   "name": "graph-schema-json-writer",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Write JSON/Objct GraphQL schema to String",
   "main": "dist/index.js",
   "scripts": {
