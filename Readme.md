@@ -157,46 +157,59 @@ class Person extends BaseEntity {
 Use the `SourceFile` class to write source files to disk:
 
 ```ts
-import { createSoureFileWriter } from "graph-schema-json-writer";
+import { createSoureFileWriter, importsMap } from "graph-schema-json-writer";
 
-// TODO: include typical import maps, such as for typeorm and class-validator
-const importsMap = {
-  Range: "class-validator",
-  BaseEntity: "typeorm",
-  Entity: "typeorm"
+// include typical import maps, such as for typeorm and class-validator
+const myImportsMap = {
+  ...importsMap.all
+  // ...custom additions or overrides
 };
 const writeOpts = {
-  importsMap
+  importsMap: myImportsMap,
+  srcFileDir: fs.join(__dirname, "db/model"),
+  only: ["Person", "Gender"]
 };
 
-// TODO: add utility method to create and return writer instance
-// for each type encountered in jsSchema
-const writers = {
-  Class: createClass(jsSchema),
-  Enum: createEnum(jsSchema)
-};
-
-const srcFileDir = fs.join(__dirname, "db/model");
-
-// TODO: add utility method to create SourceFile Writer instance
-// using writers auto-extracted from jsSchema
-const srcFileWriter = createSoureFileWriter(srcFileDir, {
-  ...writeOpts,
-  writers
-});
-
-// TODO: add utility methods to create/extract typeDef map from jsSchema
-const typeDefMap = {
-  Person: jsSchema.Person,
-  Gender: jsSchema.Gender
-};
-
-await srcFileWriter.writeTypeDefs(typeDefMap);
+const srcFileWriter = createSoureFileWriter(writeOpts);
+await srcFileWriter.writeTypeDefs(jsSchema, writeOpts);
 ```
 
-Note that the current infrastructure for writing a set of source files from a set of type definitions can (and should) be further generalized/optimized to reduce the boilerplate, using conventions.
+Assuming `__dirname` is `/src`, using default `flat` strategy:
 
-Please feel free to make PRs to faciliate this.
+```txt
+  /src
+    /db
+      /models
+        Person.ts
+        Gender.ts
+```
+
+Using defaults:
+
+```ts
+import { writeTypeDefs, importsMap } from "graph-schema-json-writer";
+// ...
+await writeTypeDefs(jsSchema, {
+  importsMap: importsMap.all,
+  srcFileDir: fs.join(__dirname, "db/model"),
+  strategy: "type-folder"
+  // only: ["Person", "Gender"]
+});
+```
+
+Using `type-folder` strategy:
+
+```txt
+  /src
+    /db
+      /models
+        /class
+          Person.ts
+        /enum/
+          Gender.ts
+```
+
+Note: The infrastructure to write source files that are all correctly linked, using correct imports etc. is still incomplete. Please submit PRs to make for a full-blown, easy to use solution that works out of the box with minimal "boilerplate" code ;)
 
 ## Use cases
 

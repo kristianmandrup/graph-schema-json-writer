@@ -9,6 +9,7 @@ import { Imports } from "./imports";
 import { flattenMap } from "./util";
 import { SchemaTypeMap } from "../types";
 import { SourceFileWriter, createSoureFileWriter } from "./source-file-writer";
+import * as importsMap from "./imports-map";
 
 export {
   Imports,
@@ -20,7 +21,8 @@ export {
   ClassType,
   SourceFileWriter,
   createSoureFileWriter,
-  writeAllClasses
+  writeAllClasses,
+  importsMap
 };
 
 export const writeToTypeDef = (jsonSchema, opts: any = {}) => {
