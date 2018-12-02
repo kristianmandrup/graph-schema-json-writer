@@ -5,7 +5,7 @@ export class BaseType extends Base {
   opts: any;
 
   constructor(map = {}, opts: any = {}) {
-    super(map, opts);
+    super(opts, map);
     this.map = map;
   }
 

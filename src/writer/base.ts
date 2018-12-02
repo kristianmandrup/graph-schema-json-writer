@@ -2,9 +2,9 @@ export class Base {
   value: any;
   opts: any;
 
-  constructor(value, opts: any = {}) {
-    this.value = value;
+  constructor(opts: any = {}, value?: any) {
     this.opts = opts;
+    this.value = value;
   }
 
   validateObj(obj) {

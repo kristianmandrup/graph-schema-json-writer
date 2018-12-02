@@ -1,4 +1,4 @@
-import { Enum, createEnum } from "./enum";
+import { Enum } from "./enum";
 
 const map = {
   Gender: {

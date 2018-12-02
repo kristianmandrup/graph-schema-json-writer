@@ -131,6 +131,10 @@ export class ClassType extends BaseType {
     }, {});
   }
 
+  writeSingle(name, classObj, opts: any) {
+    this.writeClass(name, classObj, opts);
+  }
+
   writeClass = (name, classObj, opts: WriteOpts = {}) => {
     this.validateObj(classObj);
     const { enable = {}, entityName = "class", extendsClass } = opts;

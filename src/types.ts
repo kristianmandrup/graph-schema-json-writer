@@ -17,3 +17,8 @@ export type SchemaTypeMap = {
   interfaces: any;
   unions: any;
 };
+
+export type TypeDefWriter = {
+  writeSingle(name: string, obj: any, _: any): string;
+  write(obj: any, write: Function);
+};

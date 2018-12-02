@@ -8,6 +8,7 @@ import { writeAllUnions, Union } from "./union";
 import { Imports } from "./imports";
 import { flattenMap } from "./util";
 import { SchemaTypeMap } from "../types";
+import { SourceFileWriter, createSoureFileWriter } from "./source-file-writer";
 
 export {
   Imports,
@@ -17,6 +18,8 @@ export {
   Input,
   Union,
   ClassType,
+  SourceFileWriter,
+  createSoureFileWriter,
   writeAllClasses
 };
 

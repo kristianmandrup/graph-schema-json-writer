@@ -1,4 +1,4 @@
-import { Type, writeType } from "./type";
+import { Type } from "./type";
 
 const map = {
   Person: {

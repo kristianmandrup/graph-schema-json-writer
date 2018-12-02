@@ -1,5 +1,6 @@
 import { addDirectives } from "./directive";
 import { BaseType } from "./base-type";
+import { TypeDefWriter } from "../types";
 
 export const writeEnums = enumMap => {
   const enumKeys = Object.keys(enumMap);
@@ -27,7 +28,7 @@ export const createEnum = (map, opts = {}) => {
   return new Enum(map, opts);
 };
 
-export class Enum extends BaseType {
+export class Enum extends BaseType implements TypeDefWriter {
   protected _fieldSeparator: any;
 
   constructor(map?, opts: any = {}) {
@@ -46,6 +47,10 @@ export class Enum extends BaseType {
       return acc;
     }, {});
     return this.flattenMap(enums, true);
+  }
+
+  writeSingle(name: string, enumObj: any, _: any): string {
+    return this.writeEnum(name, enumObj);
   }
 
   writeEnum(name, enumObj) {

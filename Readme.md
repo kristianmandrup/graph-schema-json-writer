@@ -121,13 +121,10 @@ The writer also supports writing a TypeScript `class`, complete with:
 
 ```js
 import { schemaToJS } from "../src/schema";
-import { writer } from "graph-schema-json-writer";
-const { writeToTypeDef } = writer;
+import { writer, createClass } from "graph-schema-json-writer";
 /// ... generate JSON schema
 const jsSchema = schemaToJS(schema);
-
-// schema where all entries with keys starting with __ are filtered out
-const classType = createClassType(jsSchema);
+const classType = createClass(jsSchema);
 
 const importsMap = {
   Range: "class-validator",
@@ -154,6 +151,52 @@ class Person extends BaseEntity {
   age: number
 }
 ```
+
+## Writing source files
+
+Use the `SourceFile` class to write source files to disk:
+
+```ts
+import { createSoureFileWriter } from "graph-schema-json-writer";
+
+// TODO: include typical import maps, such as for typeorm and class-validator
+const importsMap = {
+  Range: "class-validator",
+  BaseEntity: "typeorm",
+  Entity: "typeorm"
+};
+const writeOpts = {
+  importsMap
+};
+
+// TODO: add utility method to create and return writer instance
+// for each type encountered in jsSchema
+const writers = {
+  Class: createClass(jsSchema),
+  Enum: createEnum(jsSchema)
+};
+
+const srcFileDir = fs.join(__dirname, "db/model");
+
+// TODO: add utility method to create SourceFile Writer instance
+// using writers auto-extracted from jsSchema
+const srcFileWriter = createSoureFileWriter(srcFileDir, {
+  ...writeOpts,
+  writers
+});
+
+// TODO: add utility methods to create/extract typeDef map from jsSchema
+const typeDefMap = {
+  Person: jsSchema.Person,
+  Gender: jsSchema.Gender
+};
+
+await srcFileWriter.writeTypeDefs(typeDefMap);
+```
+
+Note that the current infrastructure for writing a set of source files from a set of type definitions can (and should) be further generalized/optimized to reduce the boilerplate, using conventions.
+
+Please feel free to make PRs to faciliate this.
 
 ## Use cases
 
