@@ -167,14 +167,17 @@ const myImportsMap = {
 const writeOpts = {
   importsMap: myImportsMap,
   srcFileDir: fs.join(__dirname, "db/model"),
-  only: ["Person", "Gender"]
+  only: ["Person", "Gender"],
+  enumRefs: true, // resolve enumRefs using importsMap
+  // classRefs true, // resolve classRefs using importsMap
+  validate: true // validate that each const reference has an entry in importsMap
 };
 
 const srcFileWriter = createSoureFileWriter(writeOpts);
 await srcFileWriter.writeTypeDefs(jsSchema, writeOpts);
 ```
 
-Assuming `__dirname` is `/src`, using default `flat` strategy:
+Files written, assuming `__dirname` is `/src`, using default `flat` strategy:
 
 ```txt
   /src
@@ -192,12 +195,12 @@ import { writeTypeDefs, importsMap } from "graph-schema-json-writer";
 await writeTypeDefs(jsSchema, {
   importsMap: importsMap.all,
   srcFileDir: fs.join(__dirname, "db/model"),
-  strategy: "type-folder"
-  // only: ["Person", "Gender"]
+  strategy: "type-folder",
+  only: ["Person", "Gender"]
 });
 ```
 
-Using `type-folder` strategy:
+Files written using `type-folder` strategy:
 
 ```txt
   /src
@@ -209,7 +212,8 @@ Using `type-folder` strategy:
           Gender.ts
 ```
 
-Note: The Source File writer has not yet been fully tested, but should include enough building blocks to make it easy to write your own solution in any case ;)
+Note: The `SourceFileWriter` has not yet been fully tested.
+It should however include enough building blocks to write your own solution in any case ;)
 
 ## Use cases
 
