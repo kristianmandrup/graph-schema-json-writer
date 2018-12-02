@@ -5,7 +5,7 @@ import { Base } from "../base";
 
 export class FileStrategy extends Base {
   baseDir: string;
-  strategy: string;
+  strategyName: string;
   stategyMap: any;
 
   constructor(opts: any = {}) {
@@ -15,7 +15,7 @@ export class FileStrategy extends Base {
       this.error("missing baseDir option", opts);
     }
     this.baseDir = baseDir;
-    this.strategy = strategy || "default";
+    this.strategyName = strategy || "default";
     this.stategyMap = stategyMap;
   }
 
@@ -58,7 +58,7 @@ export class FileStrategy extends Base {
 
   filePathFor(typeDef: any): string {
     const strategyMap = this.strategyMapFor(typeDef);
-    const fileStrategy = strategyMap[this.strategy];
+    const fileStrategy = strategyMap[this.strategyName];
     return fileStrategy(typeDef);
   }
 

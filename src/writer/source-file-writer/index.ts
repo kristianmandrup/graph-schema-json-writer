@@ -69,7 +69,12 @@ export class SourceFileWriter extends Base {
   }
 
   writerFor(typeDef: any) {
-    return this.writers[typeDef.type] || this.createWriterFor(typeDef);
+    const type = typeof typeDef === "string" ? typeDef : typeDef.type;
+    return this.lookupWriterFor(type) || this.createWriterFor(typeDef);
+  }
+
+  lookupWriterFor(type: string) {
+    return this.writers[type];
   }
 
   enumImportsMap(names: string[]) {
