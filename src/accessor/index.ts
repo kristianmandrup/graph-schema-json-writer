@@ -33,3 +33,48 @@ export const schemaByType = (jsonSchema): SchemaTypeMap => {
   }, {});
   return result;
 };
+
+export const enumRefsFor = (
+  name: string,
+  jsonSchema: any,
+  ignoreTypes?: string[]
+) => {
+  return refsFor(name, jsonSchema, "Enum", ignoreTypes);
+};
+
+export const classRefsFor = (
+  name: string,
+  jsonSchema: any,
+  ignoreTypes?: string[]
+) => {
+  return refsFor(name, jsonSchema, "Object", ignoreTypes);
+};
+
+const primitiveTypes = ["Int", "String", "Float", "Boolean"];
+
+export const refsFor = (
+  idOrObj: any,
+  jsonSchema: any,
+  refType = "Object",
+  ignoreTypes: string[] = []
+) => {
+  const typesToIgnore = [...primitiveTypes, ...ignoreTypes, name];
+  const obj = typeof idOrObj === "string" ? jsonSchema[idOrObj] : idOrObj;
+  if (typeof obj === "object") {
+    throw `invalid ${idOrObj} entry in json schema`;
+  }
+
+  const { fields } = obj;
+  const fieldKeys = Object.keys(fields);
+  fieldKeys.reduce((acc, key) => {
+    const field = fields[key];
+    const { type } = field;
+    if (typesToIgnore.includes(type)) return acc;
+    const schemaEntry = obj[type];
+    const schemaEntryType = schemaEntry.type;
+    if (schemaEntryType === refType) {
+      acc[type] = schemaEntry;
+    }
+    return acc;
+  }, {});
+};

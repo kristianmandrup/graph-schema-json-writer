@@ -1,9 +1,11 @@
-import * as fs from "fs-extra";
 import * as path from "path";
-import { Base } from "./base";
-import { dasherize } from "underscore.string";
-import { TypeDefWriter } from "../types";
-import { createClass } from "./class";
+import * as fs from "fs-extra";
+import { Base } from "../base";
+import { TypeDefWriter } from "../../types";
+import { createClass } from "../class";
+import { FileStrategy } from "./file-strategy";
+
+export { FileStrategy };
 
 export interface TypeDef {
   name: string;
@@ -26,21 +28,12 @@ type TypeDefMap = {
 };
 
 export class SourceFileWriter extends Base {
-  baseDir: string;
   writers: any;
-  strategy: string;
-  stategyMap: any;
+  strategy: FileStrategy;
 
   constructor(opts: any = {}) {
     super(opts);
-    const { writers, baseDir, strategy, stategyMap } = opts;
-    if (!baseDir) {
-      this.error("missing baseDir option", opts);
-    }
-    this.strategy = strategy || "default";
-    this.baseDir = baseDir;
-    this.writers = writers;
-    this.stategyMap = stategyMap;
+    this.strategy = new FileStrategy(opts);
   }
 
   async writeTypeDefs(typeDefMap: TypeDefMap, opts: any = {}) {
@@ -94,7 +87,7 @@ export class SourceFileWriter extends Base {
   }
 
   async writeTypeDef(typeDef: TypeDef, writer: TypeDefWriter, opts: any = {}) {
-    const fileName = this.filePathFor(typeDef);
+    const fileName = this.strategy.filePathFor(typeDef);
     const writeOpts = {
       ...this.opts,
       ...opts
@@ -107,47 +100,8 @@ export class SourceFileWriter extends Base {
     await this.writeToFile(fileName, fileContent);
   }
 
-  filePathFor(typeDef: any): string {
-    const strategyMap = this.strategyMapFor(typeDef);
-    const fileStrategy = strategyMap[this.strategy];
-    return fileStrategy(typeDef);
-  }
-
-  strategyMapFor(typeDef) {
-    const { fileName, folderName } = this.fileAndFolderNameFor(typeDef);
-    const map: any = {
-      flat: (_: any) => fileName,
-      "type-folder": (_: any) => fs.join(folderName, fileName)
-    };
-    map.default = map.flat;
-    return this.stategyMap || map;
-  }
-
-  fileAndFolderNameFor(typeDef: any): any {
-    return {
-      fileName: this.fileNameFor(typeDef),
-      folderName: this.folderNameFor(typeDef)
-    };
-  }
-
-  folderNameFor(typeDef: any): string {
-    const typeName = typeDef.sourceType || typeDef.type;
-    return this.dasherize(typeName);
-  }
-
-  fileNameFor(typeDef: any): string {
-    const name = typeDef.name;
-    const fileName = this.dasherize(name);
-    return `${fileName}.ts`;
-  }
-
-  dasherize(name: string): string {
-    const dashed = dasherize(name);
-    return dashed[0] === "_" ? dashed.substring(1) : dashed;
-  }
-
   async writeToFile(fileName: string, fileContent: string) {
-    const filePath = fs.join(this.baseDir, fileName);
+    const filePath = this.strategy.targetFilePath(fileName);
     try {
       const targetDir = path.dirname(filePath);
       await fs.ensureDir(targetDir);

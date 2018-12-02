@@ -1,4 +1,4 @@
-import { createSoureFileWriter } from "./source-file-writer";
+import { createSoureFileWriter } from ".";
 import * as fs from "fs-extra";
 const mock = require("mock-fs");
 

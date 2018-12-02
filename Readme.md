@@ -209,7 +209,24 @@ Using `type-folder` strategy:
           Gender.ts
 ```
 
-Note: The infrastructure to write source files that are all correctly linked, using correct imports etc. is still incomplete. Please submit PRs to make for a full-blown, easy to use solution that works out of the box with minimal "boilerplate" code ;)
+### Roadmap
+
+The infrastructure to write source files that are all correctly linked, using correct imports etc. is still incomplete.
+
+You can use the new `FileStrategy` class to map `Enum` and `Class` references to file imports for a given class, such as through the `classWriter.strategy` of a given class writer to ensure the imports use the same strategy as is used to write the given class.
+
+In `FileStrategy`, use the following to populate the `importsMap` of the class:
+
+- `enumFilePathFor(name)`
+- `classFilePathFor(name)`
+
+For the `ClassType` class, see the following methods for reference:
+
+- `classRefsFor`
+- `enumsFor`
+- `importsFor`
+
+Please submit PRs to make it even easier to write a set of classes with all referenced classes, enums etc. as files, all linked with correct imports. Almost there!
 
 ## Use cases
 

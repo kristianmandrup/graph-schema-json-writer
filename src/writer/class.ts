@@ -5,6 +5,7 @@ import { addImplements } from "./implements";
 import { flattenMap } from "./util";
 import { WriteOpts } from "../types";
 import { Imports } from "./imports";
+import { classRefsFor, enumRefsFor } from "../accessor";
 
 export const writeClasses = (classMap, write = writeClass) => {
   const classKeys = Object.keys(classMap);
@@ -99,6 +100,22 @@ export class ClassType extends BaseType {
       .flatMap(item => item);
   }
 
+  classRefsFor(idOrObj: any): any {
+    return classRefsFor(idOrObj, this.map);
+  }
+
+  enumRefsFor(idOrObj: any): any {
+    return enumRefsFor(idOrObj, this.map);
+  }
+
+  enumRefNames(idOrObj: string): string[] {
+    return Object.keys(this.enumRefsFor(idOrObj));
+  }
+
+  classRefNames(idOrObj: string): string[] {
+    return Object.keys(this.classRefsFor(idOrObj));
+  }
+
   decoratorsFor(classMapOrId: any) {
     return [
       ...this.classDecoratorsFor(classMapOrId),
@@ -110,7 +127,17 @@ export class ClassType extends BaseType {
     const decorators = this.decoratorsFor(classMapOrId) || [];
     const { extendsClass } = opts;
     const interfaces = this.interfacesFor(classMapOrId) || [];
-    const allImportConsts = [extendsClass, ...decorators, ...interfaces];
+
+    const enumRefNames: string[] = this.enumRefNames(classMapOrId) || [];
+    const classRefNames: string[] = this.classRefNames(classMapOrId) || [];
+
+    const allImportConsts = [
+      extendsClass,
+      ...decorators,
+      ...interfaces,
+      ...enumRefNames,
+      ...classRefNames
+    ];
     return new Imports(allImportConsts, opts || this.opts);
   }
 
