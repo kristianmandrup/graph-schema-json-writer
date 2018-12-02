@@ -53,8 +53,9 @@ export class SourceFileWriter extends Base {
 
       const { enumRefs, classRefs } = typeDef.refNames(name);
       const importsMap = this.classRefImportsMap({ enumRefs, classRefs });
+      const relativeImportsMap = this.relativeImportsMap(typeDef, importsMap);
       opts.importsMap = {
-        ...importsMap,
+        ...relativeImportsMap,
         ...(opts.importsMap || {})
       };
 
@@ -90,6 +91,15 @@ export class SourceFileWriter extends Base {
       ...this.classImportsMap(map.enumRefs),
       ...this.enumImportsMap(map.classRefs)
     };
+  }
+
+  relativeImportsMap(typeDef: any, map: any) {
+    const fromPath = this.strategy.filePathFor(typeDef);
+    return Object.keys(map).reduce((acc, key) => {
+      const toPath = map[key];
+      acc[key] = path.relative(fromPath, toPath);
+      return acc;
+    }, {});
   }
 
   get writerMap() {

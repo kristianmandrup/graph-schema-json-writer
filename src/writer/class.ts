@@ -195,13 +195,13 @@ export class ClassType extends BaseType {
       : header;
     const fields = classObj.fields || {};
 
-    const classBody = `${header} {\n${this.writeFields(fields)}\n}\n`;
+    const classBody = `export ${header} {\n${this.writeFields(fields)}\n}\n`;
 
     if (opts.importsMap) {
       const importsHeader = this.writeImportsFor(name, opts);
-      return [importsHeader, classBody].join("\n\n");
+      const classSrc = [importsHeader, classBody].join("\n\n");
+      return classSrc;
     }
-
     return classBody;
   };
 
