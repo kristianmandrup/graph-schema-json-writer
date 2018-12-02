@@ -175,6 +175,7 @@ const writeOpts = {
 
 const srcFileWriter = createSoureFileWriter(writeOpts);
 await srcFileWriter.writeTypeDefs(jsSchema, writeOpts);
+await srcFileWriter.writeIndexFiles();
 ```
 
 Files written, assuming `__dirname` is `/src`, using default `flat` strategy:
@@ -185,6 +186,7 @@ Files written, assuming `__dirname` is `/src`, using default `flat` strategy:
       /models
         Person.ts
         Gender.ts
+        index.ts
 ```
 
 Using defaults:
@@ -196,7 +198,8 @@ await writeTypeDefs(jsSchema, {
   importsMap: importsMap.all,
   srcFileDir: fs.join(__dirname, "db/model"),
   strategy: "type-folder",
-  only: ["Person", "Gender"]
+  only: ["Person", "Gender"],
+  index: true // also add index files
 });
 ```
 
@@ -208,12 +211,13 @@ Files written using `type-folder` strategy:
       /models
         /class
           Person.ts
+          index.ts
         /enum/
           Gender.ts
+          index.ts
 ```
 
-Note: The `SourceFileWriter` has not yet been fully tested.
-It should however include enough building blocks to write your own solution in any case ;)
+Note: The `SourceFileWriter` has not yet been fully tested and could use some futher refactoring. It should include enough building blocks for you to compose a solution to fit your needs ;)
 
 ## Use cases
 

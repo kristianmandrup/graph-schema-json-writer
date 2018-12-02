@@ -14,13 +14,27 @@ export interface TypeDef {
   obj: any;
 }
 
+let writer;
+
 export const createSoureFileWriter = (opts: any = {}) => {
   return new SourceFileWriter(opts);
 };
 
-export const writeTypeDefs = (typeDefMap: TypeDefMap, opts: any = {}) => {
-  const writer = createSoureFileWriter(opts);
-  return writer.writeTypeDefs(typeDefMap, opts);
+export const writeTypeDefs = async (typeDefMap: TypeDefMap, opts: any = {}) => {
+  writer = createSoureFileWriter(opts);
+  let result: any = {};
+  result = await writer.writeTypeDefs(typeDefMap, opts);
+  if (opts.index) {
+    result.index = await writer.writeIndexFiles();
+  }
+  return result;
+};
+
+export const writeIndexFiles = async () => {
+  if (!writer) {
+    throw "Missing writer. You must call writeTypeDefs before writing index files for the files written";
+  }
+  return await writer.writeIndexFiles();
 };
 
 type TypeDefMap = {
@@ -31,10 +45,19 @@ export class SourceFileWriter extends Base {
   writers: any;
   strategy: FileStrategy;
   typeDefMap: any;
+  indexMap: any;
 
   constructor(opts: any = {}) {
     super(opts);
-    this.strategy = new FileStrategy(opts);
+    this.strategy = new FileStrategy({
+      ...opts,
+      writer: this
+    });
+  }
+
+  addToIndexMap({ folderName, fileName, name }) {
+    this.indexMap[folderName] = this.indexMap[folderName] || [];
+    this.indexMap[folderName].push({ fileName, name });
   }
 
   async writeTypeDefs(typeDefMap: TypeDefMap, opts: any = {}) {
@@ -45,7 +68,8 @@ export class SourceFileWriter extends Base {
       Array.isArray(only) && only.length > 0
         ? keys.filter(key => only.includes(key))
         : keys;
-    keysToUse.reduce(async (acc, name: string) => {
+    this.indexMap = {};
+    const keyMap = keysToUse.reduce(async (acc, name: string) => {
       const typeDef = typeDefMap[name];
       typeDef.name = name;
       typeDef.sourceType = this.mapToSourceType(typeDef.type);
@@ -67,6 +91,43 @@ export class SourceFileWriter extends Base {
       acc[name] = fileLocation;
       return acc;
     }, {});
+
+    return { keyMap, indexMap: this.indexMap };
+  }
+
+  indexFileExports(indexMap?: any) {
+    indexMap = indexMap || this.indexMap;
+    return Object.keys(indexMap).reduce((acc, key) => {
+      const { fileName, name } = indexMap[key];
+      const exportStr = this.createIndexExport({ fileName, name });
+      acc[key] = acc[key] || {};
+      acc[key].push(exportStr);
+      return acc;
+    }, {});
+  }
+
+  indexFileContentMap(indexMap?: any) {
+    indexMap = indexMap || this.indexMap;
+    return Object.keys(indexMap).reduce((acc, key) => {
+      acc[key] = acc[key].join("\n");
+      return acc;
+    }, {});
+  }
+
+  async writeIndexFiles(indexMap?: any) {
+    indexMap = indexMap || this.indexMap;
+    const { baseDir } = this.strategy;
+    const contentMap = this.indexFileContentMap(indexMap);
+    return Object.keys(contentMap).map(async key => {
+      const filePath = path.join(baseDir, key, "index.ts");
+      const fileContent = contentMap[key];
+      await fs.writeFile(filePath, fileContent);
+      return filePath;
+    });
+  }
+
+  createIndexExport({ fileName, name }) {
+    return `export { ${name} } from '${fileName}';\n`;
   }
 
   writerFor(typeDef: any) {

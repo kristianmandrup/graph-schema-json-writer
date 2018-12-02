@@ -7,13 +7,15 @@ export class FileStrategy extends Base {
   baseDir: string;
   strategyName: string;
   stategyMap: any;
+  writer: any;
 
   constructor(opts: any = {}) {
     super(opts);
-    const { baseDir, strategy, stategyMap } = opts;
+    const { writer, baseDir, strategy, stategyMap } = opts;
     if (!baseDir) {
       this.error("missing baseDir option", opts);
     }
+    this.writer = writer;
     this.baseDir = baseDir;
     this.strategyName = strategy || "default";
     this.stategyMap = stategyMap;
@@ -59,7 +61,9 @@ export class FileStrategy extends Base {
   filePathFor(typeDef: any): string {
     const strategyMap = this.strategyMapFor(typeDef);
     const fileStrategy = strategyMap[this.strategyName];
-    return fileStrategy(typeDef);
+    const { folderName, fileName } = fileStrategy(typeDef);
+    this.writer.addToIndexMap({ folderName, fileName, name: typeDef.name });
+    return fs.join(folderName || ".", fileName);
   }
 
   targetFilePath(fileName: string) {
@@ -69,8 +73,8 @@ export class FileStrategy extends Base {
   strategyMapFor(typeDef) {
     const { fileName, folderName } = this.fileAndFolderNameFor(typeDef);
     const map: any = {
-      flat: (_: any) => fileName,
-      "type-folder": (_: any) => fs.join(folderName, fileName)
+      flat: (_: any) => ({ folderName: ".", fileName }),
+      "type-folder": (_: any) => ({ folderName, fileName })
     };
     map.default = map.flat;
     return this.stategyMap || map;
