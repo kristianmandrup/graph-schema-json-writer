@@ -11,7 +11,9 @@ import { SchemaTypeMap } from "../types";
 import {
   SourceFileWriter,
   createSoureFileWriter,
-  FileStrategy
+  FileStrategy,
+  writeIndexFiles,
+  writeTypeDefs
 } from "./source-file-writer";
 import * as importsMap from "./imports-map";
 
@@ -27,6 +29,8 @@ export {
   FileStrategy,
   createSoureFileWriter,
   writeAllClasses,
+  writeIndexFiles,
+  writeTypeDefs,
   importsMap
 };
 
