@@ -45,17 +45,25 @@ export class SourceFileWriter extends Base {
       Array.isArray(only) && only.length > 0
         ? keys.filter(key => only.includes(key))
         : keys;
-    keysToUse.reduce(async (acc, key: string) => {
-      const typeDef = typeDefMap[key];
-      typeDef.name = key;
+    keysToUse.reduce(async (acc, name: string) => {
+      const typeDef = typeDefMap[name];
+      typeDef.name = name;
       typeDef.sourceType = this.mapToSourceType(typeDef.type);
       const typeDefWriter = this.writerFor(typeDef);
+
+      const { enumRefs, classRefs } = typeDef.refNames(name);
+      const importsMap = this.classRefImportsMap({ enumRefs, classRefs });
+      opts.importsMap = {
+        ...importsMap,
+        ...(opts.importsMap || {})
+      };
+
       const fileLocation = await this.writeTypeDef(
         typeDef,
         typeDefWriter,
         opts
       );
-      acc[key] = fileLocation;
+      acc[name] = fileLocation;
       return acc;
     }, {});
   }
