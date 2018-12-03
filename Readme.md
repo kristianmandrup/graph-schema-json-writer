@@ -215,9 +215,15 @@ Files written using `type-folder` strategy:
         /enum/
           Gender.ts
           index.ts
+        index.ts
 ```
 
 Note: The `SourceFileWriter` has not yet been fully tested and could use some futher refactoring. It should include enough building blocks for you to compose a solution to fit your needs ;)
+
+## TODO
+
+- Support for directives/decorators args that are not maps/objects. (see `writeDirective` in `directive.ts`)
+- Support for import aliases (see `write` in `imports.ts`, allow object entry)
 
 ## Use cases
 

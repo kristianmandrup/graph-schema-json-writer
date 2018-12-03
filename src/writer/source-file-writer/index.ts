@@ -118,12 +118,50 @@ export class SourceFileWriter extends Base {
     indexMap = indexMap || this.indexMap;
     const { baseDir } = this.strategy;
     const contentMap = this.indexFileContentMap(indexMap);
-    return Object.keys(contentMap).map(async key => {
+    const keys = Object.keys(contentMap);
+    const indexFiles = keys.map(async key => {
       const filePath = path.join(baseDir, key, "index.ts");
       const fileContent = contentMap[key];
       await fs.writeFile(filePath, fileContent);
       return filePath;
     });
+
+    let rootIndexFile;
+    if (keys.length > 1) {
+      rootIndexFile = await this.writeRootIndexFile(indexMap);
+    }
+    return {
+      rootIndexFile,
+      indexFiles
+    };
+  }
+
+  rootIndexNameMap(indexMap: any) {
+    indexMap = indexMap || this.indexMap;
+    const keys = Object.keys(indexMap);
+    return keys.reduce((acc, key) => {
+      const { name } = indexMap[key];
+      acc[key] = acc[key] || [];
+      acc[key].push(name);
+      return acc;
+    }, {});
+  }
+
+  async writeRootIndexFile(indexMap: any) {
+    indexMap = indexMap || this.indexMap;
+    const { baseDir } = this.strategy;
+    const rootIndexMap = this.rootIndexNameMap(indexMap);
+    const keys = Object.keys(rootIndexMap);
+    const exportList = keys.map(async key => {
+      const names = rootIndexMap[key];
+      const exportsStr = names.join(", ");
+      return `export { ${exportsStr} } from './${key}';\n`;
+    });
+
+    const filePath = path.join(baseDir, "index.ts");
+    const fileContent = exportList.join("\n");
+    await fs.writeFile(filePath, fileContent);
+    return filePath;
   }
 
   createIndexExport({ fileName, name }) {
