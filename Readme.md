@@ -220,10 +220,19 @@ Files written using `type-folder` strategy:
 
 Note: The `SourceFileWriter` has not yet been fully tested and could use some futher refactoring. It should include enough building blocks for you to compose a solution to fit your needs ;)
 
-## TODO
+### Imports map
 
-- Support for directives/decorators args that are not maps/objects. (see `writeDirective` in `directive.ts`)
-- Support for import aliases (see `write` in `imports.ts`, allow object entry)
+Imports maps now have support for aliases
+
+```ts
+importsMap = {
+  range: { name: "Range", importPath: "validator" }
+};
+```
+
+Will result in an aliased import:
+
+`import { Range as range } from 'validator';`
 
 ## Use cases
 

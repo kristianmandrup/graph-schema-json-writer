@@ -75,6 +75,7 @@ export class Directive extends BaseType {
     };
   }
 
+  // TODO: allow args to be an array
   writeDirective(name, args, opts: any = {}) {
     const { argsWrapped = false, emptyArgs = true } = opts;
     const dirTxt = `@${name}`;
@@ -82,17 +83,29 @@ export class Directive extends BaseType {
       return emptyArgs ? dirTxt + "()" : dirTxt;
     }
     const argsWrap = argsWrapped || this.argsWrapped;
-    let argsTxt = this.writeDirectiveArgs(args);
-    argsTxt =
-      argsWrap && (argsTxt && argsTxt.length > 0) ? `{${argsTxt}}` : argsTxt;
+    let argsTxt = this.writeDirectiveArgs(args, argsWrap);
     return `@${name}(${argsTxt})`;
   }
 
-  writeDirectiveArgs = (args): string => {
-    if (!args) return "";
+  writeDirectiveArgs = (args, argsWrap: boolean): string => {
+    if (args === undefined || args === null) return "";
+    if (Array.isArray(args)) {
+      return args.join(", ");
+    }
+    if (
+      typeof args === "string" ||
+      typeof args === "number" ||
+      typeof args === "boolean"
+    ) {
+      return `${args}`;
+    }
+    // must be an object
     const keys = Object.keys(args);
     const dirMap = keys.reduce(this.argReducer(args), {});
-    return this.flattenMap(dirMap, ", ");
+    const argsTxt = this.flattenMap(dirMap, ", ");
+    return argsWrap && (argsTxt && argsTxt.length > 0)
+      ? `{${argsTxt}}`
+      : argsTxt;
   };
 
   argReducer(args) {
