@@ -71,10 +71,12 @@ export const createClass = (map, opts = {}) => {
 
 export class ClassType extends BaseType {
   addRequired: boolean;
+  classValidator: boolean;
 
   constructor(map?, opts: any = {}) {
     super(map, opts);
     this.addRequired = opts.addRequired;
+    this.classValidator = opts.classValidator;
   }
 
   classMapFor(classMapOrId: any) {
@@ -224,6 +226,20 @@ export class ClassType extends BaseType {
     return this.flattenMap(fieldMap, "\n\n");
   }
 
+  get classTypeMap() {
+    return {
+      String: "string",
+      Float: "number",
+      Int: "number",
+      Boolean: "boolean"
+    };
+  }
+
+  classType(type, nullable = false) {
+    const mappedType = this.classTypeMap[type] || type;
+    return nullable ? `${mappedType} | null` : mappedType;
+  }
+
   writeField(fieldName, fieldObj) {
     const {
       type = "String",
@@ -234,10 +250,27 @@ export class ClassType extends BaseType {
       memberKeys,
       keys
     } = fieldObj;
-    let header = `${fieldName}: ${type}`;
+    const classType = this.classType(type, isNullable);
+    let header = `${fieldName}: ${classType}`;
 
     const decoratorKeys = memberKeys || keys;
     const decoratorMap = decorators || directives;
+
+    // class-validator
+    if (this.classValidator) {
+      if (type === "Int") {
+        decoratorMap.IsInt = {};
+      }
+      if (type === "Float") {
+        decoratorMap.IsNumber = {};
+      }
+      if (type === "Boolean") {
+        decoratorMap.IsBoolean = {};
+      }
+      if (type === "String") {
+        decoratorMap.IsString = {};
+      }
+    }
 
     if (!isNullable && this.addRequired) {
       decoratorMap.Required = {};

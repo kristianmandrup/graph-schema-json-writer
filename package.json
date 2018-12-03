@@ -1,6 +1,6 @@
 {
   "name": "graph-schema-json-writer",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "description": "Write JSON/Object GraphQL schema to GraphQL Type Definition strings or TypeScript source files",
   "main": "dist/index.js",
   "scripts": {
