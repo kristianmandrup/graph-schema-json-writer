@@ -196,9 +196,14 @@ export class SourceFileWriter extends Base {
     const fromPath = this.strategy.filePathFor(typeDef);
     return Object.keys(map).reduce((acc, key) => {
       const toPath = map[key];
-      acc[key] = path.relative(fromPath, toPath);
+      acc[key] = this.relativeImportPath(fromPath, toPath);
       return acc;
     }, {});
+  }
+
+  relativeImportPath(fromPath, toPath) {
+    const { opts } = this;
+    return opts.index ? "../" : path.relative(fromPath, toPath);
   }
 
   get writerMap() {
